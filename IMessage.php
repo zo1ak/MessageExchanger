@@ -8,5 +8,6 @@ namespace Exchanger;
 interface IMessage
 {
     public function getId(): int;
+    
     public function getType(): IMessageType;
 }

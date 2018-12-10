@@ -7,5 +7,5 @@ namespace Exchanger;
  */
 interface IChannel
 {
-    public function push(IChannelMessage $message);
+    public function push(IChannelMessage $message): IResponse;
 }

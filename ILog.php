@@ -7,5 +7,5 @@ namespace Exchanger;
  */
 interface ILog
 {
-
+    public function log(IMessage $queue, IResponse $response);
 }

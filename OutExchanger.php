@@ -16,19 +16,27 @@ abstract class OutExchanger extends Exchanger
      *
      * @param IMessage $message
      */
-    public function addToQueue(IMessage $message) {
+    public function addToQueue(IMessage $message)
+    {
         $this->getQueue()->add($message);
     }
 
     /**
-     * Отправить очередь.
+     * Отправить сообщения из очереди по каналу.
      */
-    public function send() {
-        while ($message = $this->getQueue()->nextMessage()) {
+    public function send()
+    {
+        while ($queueItem = $this->getQueue()) {
+            // Получаем сообщение из очереди.
+            $message = $queueItem->getMessage();
+            // Получаем хендлер по типу сообщения.
             $handler = $this->getHandlerFactory()->build($message->getType());
+            // Наполняем пакет для отправки.
             $envelop = $handler->fill($message->getId());
-            $this->getChannel()->push($envelop);
-
+            // Отправляем пакет по каналу.
+            $response = $this->getChannel()->push($envelop);
+            // Записываем в журнал результаты.
+            $this->getLog()->log($message, $response);
         }
     }
 }
