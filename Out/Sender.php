@@ -1,30 +1,48 @@
 <?php
 
-namespace Exchanger;
+namespace Exchanger\Out;
 
 /**
  * Модуль исходящих сообщений.
  */
-abstract class OutExchanger extends Exchanger
+abstract class Sender
 {
+    /**
+     * @return IQueue
+     */
     protected abstract function getQueue(): IQueue;
 
+    /**
+     * @return IHandlerFactory
+     */
     protected abstract function getHandlerFactory(): IHandlerFactory;
+
+    /**
+     * @return IChannel
+     */
+    protected abstract function getChannel(): IChannel;
+
+    /**
+     * @return ILog
+     */
+    protected abstract function getLog(): ILog;
 
     /**
      * Добавить сообщение в очередь на отправку.
      *
      * @param IMessage $message
+     * @return Sender
      */
-    public function addToQueue(IMessage $message)
+    public function add(IMessage $message): self
     {
         $this->getQueue()->add($message);
+        return $this;
     }
 
     /**
      * Отправить сообщения из очереди по каналу.
      */
-    public function send()
+    public function send(): void
     {
         while ($queueItem = $this->getQueue()) {
             // Получаем сообщение из очереди.
@@ -34,7 +52,7 @@ abstract class OutExchanger extends Exchanger
             // Наполняем пакет для отправки.
             $envelop = $handler->fill($message->getId());
             // Отправляем пакет по каналу.
-            $response = $this->getChannel()->push($envelop);
+            $response = $this->getChannel()->request($envelop);
             // Записываем в журнал результаты.
             $this->getLog()->log($message, $response);
         }

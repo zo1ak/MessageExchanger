@@ -1,6 +1,6 @@
 <?php
 
-namespace Exchanger;
+namespace Exchanger\Out;
 
 
 interface IResponse
